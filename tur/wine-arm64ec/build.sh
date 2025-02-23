@@ -10,7 +10,7 @@ TERMUX_PKG_SRCURL=https://dl.winehq.org/wine/source/10.x/wine-10.1.tar.xz
 TERMUX_PKG_SHA256=63471e37b1a515795ff3368d26a039261660e1377cb427d1b61b3a7b76091663
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libandroid-shmem, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, mesa, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
 TERMUX_PKG_ANTI_BUILD_DEPENDS="vulkan-loader"
-TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, libandroid-shmem-static, vulkan-loader-generic"
+TERMUX_PKG_BUILD_DEPENDS="libandroid-spawn-static, libandroid-shmem-static, vulkan-loader-generic, ffmpeg, gst-libav, gst-plugins-bad, gst-plugins-base, gst-plugins-good, gst-plugins-ugly, gstreamer"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_HOSTBUILD=true
 TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
@@ -39,7 +39,8 @@ enable_wineandroid_drv=no
 --with-gettextpo=no
 --without-gphoto
 --with-gnutls
---without-gstreamer
+--with-gstreamer
+--with-ffmpeg
 --without-inotify
 --with-krb5
 --with-mingw=clang
@@ -124,11 +125,23 @@ termux_step_make() {
 termux_step_make_install() {
 	make -j $TERMUX_PKG_MAKE_PROCESSES install
 
-	# Create hangover-wine script
+	# Create wine wrapper
 	mkdir -p $TERMUX_PREFIX/bin
 	cat << EOF > $TERMUX_PREFIX/bin/wine-arm64ec
 #!$TERMUX_PREFIX/bin/env sh
 exec $TERMUX_PREFIX/opt/wine-arm64ec/bin/wine "\$@"
 EOF
 	chmod +x $TERMUX_PREFIX/bin/wine-arm64ec
+
+        cat << EOF > $TERMUX_PREFIX/bin/wineserver-arm64ec
+#!$TERMUX_PREFIX/bin/env sh
+exec $TERMUX_PREFIX/opt/wine-arm64ec/bin/wineserver "\$@"
+EOF
+	chmod +x $TERMUX_PREFIX/bin/wineserver-arm64ec
+
+        cat << EOF > $TERMUX_PREFIX/bin/wineboot-arm64ec
+#!$TERMUX_PREFIX/bin/env sh
+exec $TERMUX_PREFIX/opt/wine-arm64ec/bin/wineboot "\$@"
+EOF
+	chmod +x $TERMUX_PREFIX/bin/wineboot-arm64ec
 }
