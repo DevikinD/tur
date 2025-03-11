@@ -77,10 +77,10 @@ enable_wineandroid_drv=no
 _setup_llvm_mingw_toolchain() {
 	# LLVM-mingw's version number must not be the same as the NDK's.
 	local _llvm_mingw_version=19
-	local _version="20250228"
+	local _version="20250305"
 	local _url="https://github.com/bylaws/llvm-mingw/releases/download/$_version/llvm-mingw-$_version-ucrt-ubuntu-20.04-x86_64.tar.xz"
 	local _path="$TERMUX_PKG_CACHEDIR/$(basename $_url)"
-	local _sha256sum=ed77a8744b05c070be2680f128cfe68f813657f1abedd7d6b0b17ad4f1c97cf2
+	local _sha256sum=30950e32b6d3d222488e2b0ec254cd5da15125dab7a2a8c4ebf559f06f3eb256
 	termux_download $_url $_path $_sha256sum
 	local _extract_path="$TERMUX_PKG_CACHEDIR/llvm-mingw-toolchain-$_llvm_mingw_version"
 	if [ ! -d "$_extract_path" ]; then
@@ -138,4 +138,10 @@ termux_step_make_install() {
 exec $TERMUX_PREFIX/opt/proton-wine/bin/wine "\$@"
 EOF
 	chmod +x $TERMUX_PREFIX/bin/proton-wine
+
+        cat << EOF > $TERMUX_PREFIX/bin/proton-wineserver
+#!$TERMUX_PREFIX/bin/env sh
+exec $TERMUX_PREFIX/opt/proton-wine/bin/wineserver "\$@"
+EOF
+	chmod +x $TERMUX_PREFIX/bin/proton-wineserver
 }
