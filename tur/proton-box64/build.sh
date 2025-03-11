@@ -1,5 +1,5 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/bylaws/wine
-TERMUX_PKG_DESCRIPTION="A compatibility layer for running Windows programs (Proton fork)"
+TERMUX_PKG_DESCRIPTION="A compatibility layer for running Windows programs (Proton fork for use with Box64)"
 TERMUX_PKG_LICENSE="LGPL-2.1"
 TERMUX_PKG_LICENSE_FILE="LICENSE, LICENSE.OLD, COPYING.LIB"
 TERMUX_PKG_MAINTAINER="@termux-user-repository"
@@ -18,12 +18,12 @@ TERMUX_PKG_EXTRA_HOSTBUILD_CONFIGURE_ARGS="
 --disable-tests
 "
 
-TERMUX_PKG_BLACKLISTED_ARCHES="arm, i686, x86_64"
+TERMUX_PKG_BLACKLISTED_ARCHES="arm, aarch64, i686"
 
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 enable_wineandroid_drv=no
---prefix=$TERMUX_PREFIX/opt/proton-wine
---exec-prefix=$TERMUX_PREFIX/opt/proton-wine
+--prefix=$TERMUX_PREFIX/opt/proton-box64
+--exec-prefix=$TERMUX_PREFIX/opt/proton-box64
 --libdir=$TERMUX_PREFIX/opt/proton-wine/lib
 --with-wine-tools=$TERMUX_PKG_HOSTBUILD_DIR
 --enable-nls
@@ -67,9 +67,9 @@ enable_wineandroid_drv=no
 --with-xrandr
 --with-xrender
 --without-xshape
---with-xshm
+--without-xshm
 --without-xxf86vm
---enable-archs=i386,aarch64,arm64ec
+--enable-archs=i386,x86_64
 "
 # TODO: `--enable-archs=arm` doesn't build with option `--with-mingw=clang`, but
 # TODO: `arm64ec` doesn't build with option `--with-mingw` (arm64ec-w64-mingw32-clang)
@@ -121,7 +121,7 @@ termux_step_pre_configure() {
 	CXXFLAGS+=" -Wno-implicit-function-declaration"
 
 	# Link android-spawn
-	LDFLAGS+=" -landroid-spawn -landroid-shmem"
+	LDFLAGS+=" -landroid-spawn"
 }
 
 termux_step_make() {
@@ -133,9 +133,9 @@ termux_step_make_install() {
 
 	# Create proton-wine script
 	mkdir -p $TERMUX_PREFIX/bin
-	cat << EOF > $TERMUX_PREFIX/bin/proton-wine
+	cat << EOF > $TERMUX_PREFIX/bin/proton-box64
 #!$TERMUX_PREFIX/bin/env sh
-exec $TERMUX_PREFIX/opt/proton-wine/bin/wine "\$@"
+exec $TERMUX_PREFIX/opt/proton-box64/bin/wine "\$@"
 EOF
-	chmod +x $TERMUX_PREFIX/bin/proton-wine
+	chmod +x $TERMUX_PREFIX/bin/proton-box64
 }
